@@ -47,6 +47,7 @@
     "framer-motion": "^12.42.2",
     "highlight.js": "^11.11.1",
     "i18next": "^26.3.4",
+    "katex": "^0.17.0",
     "lucide-react": "^1.23.0",
     "mathjs": "^15.2.0",
     "ollama": "^0.6.3",
@@ -55,6 +56,8 @@
     "react-i18next": "^17.0.8",
     "react-markdown": "^10.1.0",
     "rehype-highlight": "^7.0.2",
-    "remark-gfm": "^4.0.1"
+    "rehype-katex": "^7.0.1",
+    "remark-gfm": "^4.0.1",
+    "remark-math": "^6.0.0"
   }
 }
