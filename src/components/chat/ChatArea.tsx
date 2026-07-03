@@ -39,6 +39,29 @@ export default function ChatArea(props: ChatAreaProps) {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [activeChat?.messages, props.isGenerating]);
 
+  // Pre-process messages to combine consecutive assistant turns (including tool interactions)
+  const displayMessages: (import('../../types').Message & { originalIndexes: number[] })[] = [];
+  if (activeChat) {
+    activeChat.messages.forEach((msg, index) => {
+      if (msg.toolResult) return; // Hide internal tool result injections
+
+      if (msg.role === 'assistant' && displayMessages.length > 0) {
+        const last = displayMessages[displayMessages.length - 1];
+        if (last.role === 'assistant') {
+          // Merge this assistant message into the previous one
+          last.content = (last.content + '\n\n' + msg.content).trim();
+          if (msg.thinking) {
+            last.thinking = (last.thinking ? last.thinking + '\n\n' : '') + msg.thinking;
+          }
+          last.interrupted = last.interrupted || msg.interrupted;
+          last.originalIndexes.push(index);
+          return;
+        }
+      }
+      displayMessages.push({ ...msg, originalIndexes: [index] });
+    });
+  }
+
   return (
     <div className="chat-layout" style={{ display: 'flex', height: '100%', width: '100%' }}>
       <ChatSidebar
@@ -70,18 +93,17 @@ export default function ChatArea(props: ChatAreaProps) {
         ) : (
           <>
             <div className="messages-list">
-              {activeChat && activeChat.messages
-                .filter(msg => !msg.toolResult) // Hide internal tool result injections
-                .map((msg, index) => {
-                const isLast = index === activeChat.messages.length - 1;
-                const isStreamingThis = props.isGenerating && isLast && msg.role === 'assistant';
+              {displayMessages.map((group, groupIdx) => {
+                const isLastInOriginal = group.originalIndexes.includes(activeChat.messages.length - 1);
+                const isStreamingThis = props.isGenerating && isLastInOriginal && group.role === 'assistant';
+                const primaryIndex = group.originalIndexes[0];
                 return (
                   <MessageBubble
-                    key={index}
-                    message={msg}
+                    key={groupIdx}
+                    message={group}
                     isStreaming={isStreamingThis}
-                    onEdit={msg.role === 'user' ? () => props.onEditMessage(activeChat.id, index) : undefined}
-                    onRetry={msg.role === 'assistant' && !props.isGenerating ? () => props.onRetryMessage(activeChat.id) : undefined}
+                    onEdit={group.role === 'user' ? () => props.onEditMessage(activeChat.id, primaryIndex) : undefined}
+                    onRetry={group.role === 'assistant' && !props.isGenerating ? () => props.onRetryMessage(activeChat.id) : undefined}
                   />
                 );
               })}

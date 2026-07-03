@@ -27,9 +27,12 @@
     "@electron-forge/plugin-vite": "^7.11.2",
     "@electron/fuses": "^1.8.0",
     "@tailwindcss/vite": "^4.3.2",
+    "@types/cheerio": "^0.22.35",
     "@types/electron-squirrel-startup": "^1.0.2",
+    "@types/marked": "^5.0.2",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
+    "@types/turndown": "^5.0.6",
     "@typescript-eslint/eslint-plugin": "^5.62.0",
     "@typescript-eslint/parser": "^5.62.0",
     "@vitejs/plugin-react": "^5.2.0",
@@ -43,12 +46,16 @@
     "vite": "^5.4.21"
   },
   "dependencies": {
+    "cheerio": "^1.2.0",
     "electron-squirrel-startup": "^1.0.1",
     "framer-motion": "^12.42.2",
+    "googlethis": "^1.8.0",
     "highlight.js": "^11.11.1",
+    "html2pdf.js": "^0.14.0",
     "i18next": "^26.3.4",
     "katex": "^0.17.0",
     "lucide-react": "^1.23.0",
+    "marked": "^18.0.5",
     "mathjs": "^15.2.0",
     "ollama": "^0.6.3",
     "react": "^19.2.7",
@@ -58,6 +65,7 @@
     "rehype-highlight": "^7.0.2",
     "rehype-katex": "^7.0.1",
     "remark-gfm": "^4.0.1",
-    "remark-math": "^6.0.0"
+    "remark-math": "^6.0.0",
+    "turndown": "^7.2.4"
   }
 }

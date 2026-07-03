@@ -1,5 +1,8 @@
 import { get_current_time } from './tools/get_current_time';
 import { calculate } from './tools/calculate';
+import { searchWebTool } from './tools/search_web';
+import { readUrlTool } from './tools/read_url';
+import { generateFileTool } from './tools/generate_file';
 
 export interface AIToolParameter {
   type: 'string' | 'number' | 'boolean' | 'array';
@@ -18,5 +21,8 @@ export interface AITool {
 // Export all available tools
 export const availableTools: AITool[] = [
   get_current_time,
-  calculate
+  calculate,
+  searchWebTool,
+  readUrlTool,
+  generateFileTool
 ];

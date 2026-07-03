@@ -6,6 +6,7 @@ export interface Message {
   interrupted?: boolean;
   toolCall?: { name: string; arguments: any }; // Assistant's intended tool call
   toolResult?: string; // Result payload from a tool execution
+  hiddenContext?: string; // Hidden system injection specific to this message
 }
 
 export interface ChatSession {

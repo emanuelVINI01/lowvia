@@ -4,32 +4,45 @@ export interface ParsedToolCall {
 }
 
 /**
- * Extracts a JSON block from inside <tool_call> tags and attempts to parse it resiliently.
+ * Extracts JSON blocks from inside multiple <tool_call> tags and attempts to parse them resiliently.
  */
-export const extractToolCall = (text: string): ParsedToolCall | null => {
-  const match = text.match(/<tool_call>\s*(\{[\s\S]*?\})\s*<\/tool_call>/);
-  if (!match) return null;
+export const extractToolCalls = (text: string): ParsedToolCall[] => {
+  const regex = /<tool_call>\s*(\{[\s\S]*?\})\s*<\/tool_call>/g;
+  const matches = [...text.matchAll(regex)];
+  
+  if (matches.length === 0) return [];
 
-  let jsonStr = match[1].trim();
+  const parsedCalls: ParsedToolCall[] = [];
 
-  try {
-    // Attempt standard parse first
-    return JSON.parse(jsonStr) as ParsedToolCall;
-  } catch (e) {
-    // Heuristic repair for common LLM JSON errors (like trailing commas or missing quotes)
+  for (const match of matches) {
+    let jsonStr = match[1].trim();
+
     try {
-      jsonStr = jsonStr.replace(/,\s*([\}\]])/g, '$1'); // Remove trailing commas
-      jsonStr = jsonStr.replace(/'/g, '"'); // Replace single quotes with double quotes
-      
-      const parsed = JSON.parse(jsonStr);
+      // Attempt standard parse first
+      const parsed = JSON.parse(jsonStr) as ParsedToolCall;
       if (parsed.name && typeof parsed.arguments === 'object') {
-        return parsed as ParsedToolCall;
+        parsedCalls.push(parsed);
+        continue;
       }
-    } catch {
-      // Return null if all parsing heuristics fail
-      return null;
+    } catch (e) {
+      // Heuristic repair for common LLM JSON errors (like trailing commas or missing quotes)
+      try {
+        jsonStr = jsonStr.replace(/,\s*([\}\]])/g, '$1'); // Remove trailing commas
+        jsonStr = jsonStr.replace(/'/g, '"'); // Replace single quotes with double quotes
+        
+        const parsed = JSON.parse(jsonStr);
+        if (parsed.name && typeof parsed.arguments === 'object') {
+          parsedCalls.push(parsed as ParsedToolCall);
+        }
+      } catch (err: any) {
+        // Do not skip! Feed the syntax error back so the LLM can correct it
+        parsedCalls.push({
+          name: '_syntax_error',
+          arguments: { error: `Failed to parse JSON: ${err.message}` }
+        });
+      }
     }
   }
 
-  return null;
+  return parsedCalls;
 };

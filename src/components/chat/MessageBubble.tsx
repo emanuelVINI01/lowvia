@@ -4,7 +4,7 @@ import remarkGfm from 'remark-gfm';
 import rehypeHighlight from 'rehype-highlight';
 import { Message } from '../../types';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Pencil, RotateCcw, AlertTriangle } from 'lucide-react';
+import { Pencil, RotateCcw, AlertTriangle, Copy, Check } from 'lucide-react';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import 'highlight.js/styles/base16/snazzy.css';
@@ -24,6 +24,20 @@ const MessageBubble = memo(function MessageBubble({
   onRetry,
 }: MessageBubbleProps) {
   const [hovered, setHovered] = useState(false);
+  const [isCopied, setIsCopied] = useState(false);
+
+  const handleCopy = async () => {
+    if (!message.content) return;
+    try {
+      // Remove tool call XML blocks from the copied text to give the user clean text
+      const textToCopy = message.content.replace(/<tool_call>[\s\S]*?<\/tool_call>/g, '').trim();
+      await navigator.clipboard.writeText(textToCopy);
+      setIsCopied(true);
+      setTimeout(() => setIsCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy text: ', err);
+    }
+  };
 
   // Determine thinking display state
   const hasThinking = !!message.thinking;
@@ -39,7 +53,7 @@ const MessageBubble = memo(function MessageBubble({
           const parsed = JSON.parse(jsonStr);
           toolCalls.push(parsed);
         } catch {
-          toolCalls.push({ name: 'Erro na ferramenta', arguments: {} });
+          toolCalls.push({ name: '⚠️ Erro de Sintaxe (JSON Inválido)', arguments: { erro: 'O modelo gerou um JSON malformado e foi instruído a corrigir.' } });
         }
         return ''; // Remove the raw XML from the markdown output
       })
@@ -179,8 +193,23 @@ const MessageBubble = memo(function MessageBubble({
               background: 'rgba(126,87,194,0.1)', border: '1px solid rgba(126,87,194,0.25)',
               borderRadius: '4px', padding: '2px 8px', cursor: 'pointer',
               color: 'var(--text-secondary)', fontSize: '0.72rem',
+              transition: 'all 0.2s ease'
             }}>
               <RotateCcw size={11} /> Regenerar
+            </button>
+          )}
+          {message.role === 'assistant' && hovered && message.content && !isStreaming && (
+            <button onClick={handleCopy} style={{
+              display: 'flex', alignItems: 'center', gap: '4px',
+              background: isCopied ? 'rgba(34,197,94,0.15)' : 'rgba(126,87,194,0.1)', 
+              border: isCopied ? '1px solid rgba(34,197,94,0.4)' : '1px solid rgba(126,87,194,0.25)',
+              borderRadius: '4px', padding: '2px 8px', cursor: 'pointer',
+              color: isCopied ? '#22c55e' : 'var(--text-secondary)', fontSize: '0.72rem',
+              transition: 'all 0.2s ease',
+              transform: isCopied ? 'scale(0.95)' : 'scale(1)'
+            }}>
+              {isCopied ? <Check size={11} /> : <Copy size={11} />} 
+              {isCopied ? 'Copiado' : 'Copiar'}
             </button>
           )}
         </div>
