@@ -9,7 +9,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { generateSystemPrompt } from './agent/systemPrompt';
 import { availableTools } from './agent/tools';
-import { extractToolCall } from './utils/parser';
+import { extractToolCalls } from './utils/parser';
 
 const STREAM_KEY = 'ollama_active_stream';
 
@@ -53,8 +53,6 @@ export default function App() {
   // Stream abort ref — lets us cancel on unmount
   const abortControllers = useRef<Map<string, AbortController>>(new Map());
 
-  const isChatsLoaded = useRef(false);
-
   // ── Load state on mount ────────────────────────────────────────
   useEffect(() => {
     // Chats
@@ -81,7 +79,6 @@ export default function App() {
 
     setChats(loadedChats);
     setActiveChatId(loadedChats.length > 0 ? loadedChats[0].id : null);
-    isChatsLoaded.current = true;
 
     // Saved settings
     const savedModel = localStorage.getItem('ai_global_model');
@@ -95,8 +92,12 @@ export default function App() {
   }, []);
 
   // ── Persist chats ──────────────────────────────────────────────
+  const isFirstRender = useRef(true);
   useEffect(() => {
-    if (!isChatsLoaded.current) return;
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
     if (chats.length > 0) localStorage.setItem('ai_chats_v1', JSON.stringify(chats));
     else localStorage.removeItem('ai_chats_v1');
   }, [chats]);
@@ -217,7 +218,24 @@ export default function App() {
     setProvider(p);
     localStorage.setItem('ai_provider', p);
   };
-  const handleGlobalModelChange = (name: string) => {
+  const handleGlobalModelChange = async (name: string) => {
+    // Force unload the previously active model to clear VRAM before loading the new one
+    if (globalModel && globalModel !== name) {
+      try {
+        const cleanHost = hostUrl.replace(/\/v1\/?$/, '');
+        if (provider === 'ollama') {
+          // Ollama's API for unloading a model
+          await fetch(`${cleanHost}/api/generate`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ model: globalModel, keep_alive: 0 })
+          });
+        }
+      } catch (e) {
+        console.error('Failed to unload previous model from VRAM', e);
+      }
+    }
+
     setGlobalModel(name);
     localStorage.setItem('ai_global_model', name);
   };
@@ -266,7 +284,10 @@ export default function App() {
     abortControllers.current.set(targetChatId, abort);
 
     const currentChat = workingChats.find(c => c.id === targetChatId);
-    const history = (currentChat?.messages || []).map(m => ({ role: m.role, content: m.content }));
+    const history = (currentChat?.messages || []).map(m => ({ 
+      role: m.role, 
+      content: m.hiddenContext ? `${m.content}\n\n${m.hiddenContext}` : m.content 
+    }));
 
     const systemPrompt = generateSystemPrompt(baseSystemPrompt);
     let prompt = systemPrompt;
@@ -295,6 +316,7 @@ export default function App() {
             options: {
               num_ctx: contextLimit > 0 ? contextLimit : 8192,
               num_batch: batchLimit > 0 ? batchLimit : 2048,
+              num_gpu: 999, // Force maximum GPU offload including KV cache
             },
           }),
         });
@@ -412,39 +434,58 @@ export default function App() {
 
 
       // --- Tool Calling Interception ---
-      const toolCall = extractToolCall(accumulated);
-      if (toolCall) {
-        const tool = availableTools.find(t => t.name === toolCall.name);
-        let toolResultText = '';
-        if (tool) {
-          try {
-            toolResultText = await tool.execute(toolCall.arguments);
-          } catch (e: any) {
-            toolResultText = `Error executing tool: ${e.message}`;
+      const extractedTools = extractToolCalls(accumulated);
+      if (extractedTools.length > 0) {
+        let allToolResultsContent = '';
+        
+        // Execute all tools concurrently
+        const results = await Promise.all(extractedTools.map(async (toolCall) => {
+          if (toolCall.name === '_syntax_error') {
+            return { 
+              name: 'error', 
+              result: `CRITICAL ERROR: ${toolCall.arguments.error}. Your previous <tool_call> block contained malformed JSON. You MUST output strictly valid JSON. Please try again.` 
+            };
           }
-        } else {
-          toolResultText = `Error: Tool '${toolCall.name}' not found.`;
+
+          const tool = availableTools.find(t => t.name === toolCall.name);
+          let toolResultText = '';
+          if (tool) {
+            try {
+              toolResultText = await tool.execute(toolCall.arguments);
+            } catch (e: any) {
+              toolResultText = `Error executing tool: ${e.message}`;
+            }
+          } else {
+            toolResultText = `Error: Tool '${toolCall.name}' not found.`;
+          }
+          return { name: toolCall.name, result: toolResultText };
+        }));
+
+        for (const res of results) {
+          allToolResultsContent += `<tool_result name="${res.name}">\n${res.result}\n</tool_result>\n\n`;
         }
 
         const toolResultMsg: Message = {
           role: 'user', // We use 'user' role to feed the result back to local models seamlessly
-          content: `<tool_result>\n${toolResultText}\n</tool_result>\n\nContinue answering the user based on this result. Do NOT output <tool_call> again for this specific step.`,
+          content: `${allToolResultsContent}Continue answering the user based on these results. Do NOT output <tool_call> again for this specific step.`,
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          toolCall: toolCall,
-          toolResult: toolResultText,
+          toolCall: extractedTools[0], // Keep for legacy types, the bubble extracts its own from content
+          toolResult: allToolResultsContent,
         };
 
         isRecursive = true;
+        let updatedForNextStream: ChatSession[] = [];
         setChats(prev => {
           const updated = prev.map(c => {
             if (c.id !== targetChatId) return c;
             return { ...c, messages: [...c.messages, toolResultMsg] };
           });
-          
-          // Re-trigger generation with the updated chats
-          setTimeout(() => sendStream('', targetChatId, updated), 50);
+          updatedForNextStream = updated;
           return updated;
         });
+        
+        // Re-trigger generation safely outside setState
+        setTimeout(() => sendStream('', targetChatId, updatedForNextStream), 50);
       }
 
       // Stream finished clean — clear the recovery key if not recursive
@@ -538,8 +579,25 @@ export default function App() {
     if (activeChatId && generatingChats.includes(activeChatId)) return;
     setInput('');
 
+    let displayUserText = userText;
+    let hiddenContext = '';
+
+    // Slash Commands Interception
+    if (userText.startsWith('/pesquisa-profunda')) {
+      displayUserText = userText.replace('/pesquisa-profunda', '').trim() || 'Inicie uma pesquisa profunda sobre as notícias de hoje.';
+      hiddenContext = `[DIRETIVA DE SISTEMA PARA ESTE TURNO]: Esta é uma PESQUISA PROFUNDA iniciada pelo usuário. Você ESTÁ ESTRITAMENTE PROIBIDO de responder imediatamente usando apenas o seu conhecimento paramétrico.
+Passos obrigatórios:
+1. Formule múltiplas queries e use a ferramenta \`search_web\` para encontrar links promissores.
+2. AGUARDE os resultados. Não emita outras ferramentas ainda.
+3. Dos resultados da busca, analise os URLs mais relevantes.
+4. Utilize a ferramenta \`read_url\` passando o URL exato para fazer o scraping completo e ler o conteúdo denso da página. Pode ler mais do que uma se necessário.
+5. APENAS APÓS ingerir o conteúdo com o \`read_url\`, elabore a sua resposta final ultra-detalhada com citações inline do link original.`;
+    }
+
     const newMsg: Message = {
-      role: 'user', content: userText,
+      role: 'user', 
+      content: displayUserText,
+      ...(hiddenContext && { hiddenContext }),
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     };
 
@@ -575,9 +633,11 @@ export default function App() {
     const chat = chats.find(c => c.id === chatId);
     if (!chat) return;
 
-    // Trim trailing assistant messages
+    // Trim trailing assistant messages and their associated hidden tool results
     const trimmed = [...chat.messages];
-    while (trimmed.length && trimmed[trimmed.length - 1].role === 'assistant') trimmed.pop();
+    while (trimmed.length && (trimmed[trimmed.length - 1].role === 'assistant' || trimmed[trimmed.length - 1].toolResult)) {
+      trimmed.pop();
+    }
     if (!trimmed.length) return;
 
     const lastUserContent = trimmed[trimmed.length - 1].content;
