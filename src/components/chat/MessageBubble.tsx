@@ -5,7 +5,10 @@ import rehypeHighlight from 'rehype-highlight';
 import { Message } from '../../types';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Pencil, RotateCcw, AlertTriangle } from 'lucide-react';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
 import 'highlight.js/styles/base16/snazzy.css';
+import 'katex/dist/katex.min.css';
 
 interface MessageBubbleProps {
   message: Message;
@@ -30,7 +33,7 @@ const MessageBubble = memo(function MessageBubble({
 
   // Parse tool calls for accordion display
   const toolCalls: any[] = [];
-  const displayContent = message.content
+  let displayContent = message.content
     ? message.content.replace(/<tool_call>\s*(\{[\s\S]*?\})\s*<\/tool_call>/g, (match, jsonStr) => {
         try {
           const parsed = JSON.parse(jsonStr);
@@ -41,6 +44,11 @@ const MessageBubble = memo(function MessageBubble({
         return ''; // Remove the raw XML from the markdown output
       })
     : '';
+
+  // Hide incomplete tool calls during streaming so raw XML doesn't flash
+  if (isStreaming) {
+    displayContent = displayContent.replace(/<tool_call>[\s\S]*$/, '');
+  }
 
   return (
     <motion.div
@@ -131,11 +139,11 @@ const MessageBubble = memo(function MessageBubble({
       ))}
 
       {/* ── Main content ── */}
-      <div className={isStreaming && !message.interrupted && displayContent ? 'stream-cursor' : ''}>
-        {displayContent ? (
+      {displayContent.trim() ? (
+        <div className={isStreaming && !message.interrupted ? 'stream-cursor' : ''}>
           <ReactMarkdown
-            remarkPlugins={[remarkGfm]}
-            rehypePlugins={[rehypeHighlight]}
+            remarkPlugins={[remarkGfm, remarkMath]}
+            rehypePlugins={[rehypeHighlight, rehypeKatex]}
             components={{
               code({ className, children, ...props }) {
                 const match = /language-(\w+)/.exec(className || '');
@@ -149,8 +157,8 @@ const MessageBubble = memo(function MessageBubble({
           >
             {displayContent}
           </ReactMarkdown>
-        ) : null}
-      </div>
+        </div>
+      ) : null}
 
       {/* ── Footer ── */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '10px' }}>
