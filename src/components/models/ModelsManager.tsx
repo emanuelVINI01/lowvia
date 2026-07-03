@@ -1,0 +1,90 @@
+import React from 'react';
+import { AIModel } from '../../types';
+import { useTranslation } from 'react-i18next';
+
+interface ModelsManagerProps {
+  models: AIModel[];
+  checkProviderStatus: () => void;
+  globalModel: string;
+  setGlobalModel: (model: string) => void;
+}
+
+export default function ModelsManager({ models, checkProviderStatus, globalModel, setGlobalModel }: ModelsManagerProps) {
+  const { t } = useTranslation();
+  
+  const formatFileSize = (bytes: number) => {
+    if (bytes === 0) return '0 B';
+    const k = 1024;
+    const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  };
+
+  return (
+    <div style={{ maxWidth: '900px', margin: '0 auto', width: '100%' }}>
+      <div className="grid-2">
+        <div className="card">
+          <h3 className="card-title" style={{ marginBottom: '16px' }}>{t('models.installedTitle')}</h3>
+          {models.length === 0 ? (
+            <p style={{ color: 'var(--text-secondary)' }}>{t('models.noModels')}</p>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {models.map((model) => {
+                const isActive = model.id === globalModel;
+                return (
+                  <div 
+                    key={model.id} 
+                    onClick={() => setGlobalModel(model.id)}
+                    style={{ 
+                      display: 'flex', 
+                      justifyContent: 'space-between', 
+                      padding: '14px 16px', 
+                      background: isActive ? 'rgba(99, 102, 241, 0.12)' : 'var(--bg-tertiary)', 
+                      borderRadius: '10px', 
+                      border: isActive ? '2px solid var(--accent-indigo)' : '1px solid var(--border-color)',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease',
+                    }}
+                    className="model-item-card"
+                  >
+                    <div>
+                      <div style={{ fontWeight: 600, color: isActive ? 'var(--text-primary)' : 'var(--text-secondary)' }}>
+                        {model.name} {isActive && ' 🌟'}
+                      </div>
+                      <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '4px' }}>
+                        {model.provider === 'ollama' 
+                          ? <>{t('models.family')}: {model.details?.family || 'N/A'} • {t('models.size')}: {model.details?.parameter_size || 'N/A'}</>
+                          : <>{model.provider} Model</>
+                        }
+                      </div>
+                    </div>
+                    {model.size !== undefined && (
+                      <div style={{ alignSelf: 'center', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                        {formatFileSize(model.size)}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
+        <div className="card" style={{ height: 'fit-content' }}>
+          <h3 className="card-title">{t('models.howToPull')}</h3>
+          <p style={{ color: 'var(--text-secondary)', marginBottom: '16px', fontSize: '0.95rem', lineHeight: '1.6' }}>
+            {t('models.howToPullDesc')}
+          </p>
+          <div style={{ backgroundColor: 'var(--bg-tertiary)', padding: '16px', borderRadius: '8px', border: '1px solid var(--border-color)', marginBottom: '20px' }}>
+            <code style={{ fontFamily: 'JetBrains Mono', color: 'var(--accent-indigo)' }}>
+              ollama pull llama3
+            </code>
+          </div>
+          <button className="btn btn-secondary" onClick={checkProviderStatus}>
+            {t('models.refreshBtn')}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}

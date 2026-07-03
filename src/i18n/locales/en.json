@@ -1,0 +1,62 @@
+{
+  "nav": {
+    "models": "Models",
+    "chat": "Chat",
+    "settings": "Settings"
+  },
+  "topbar": {
+    "ollamaStatus": "Ollama Status",
+    "connected": "Connected",
+    "offline": "Offline",
+    "checking": "Checking...",
+    "models": "Models"
+  },
+  "chat": {
+    "newChat": "New Chat",
+    "newConversation": "New Conversation",
+    "instant": "Instant",
+    "thinking": "Thinking",
+    "placeholder": "Ask anything... (Enter to send, Shift+Enter for new line)",
+    "generating": "Generating response...",
+    "offlineTitle": "Ollama Offline",
+    "offlineDesc": "We couldn't connect to Ollama at {{url}}. Make sure the Ollama desktop app is open or the service is running.",
+    "retryBtn": "Retry Connection",
+    "noModelsTitle": "No Models Found",
+    "noModelsDesc": "Ollama is running, but you have no models downloaded yet.",
+    "pullModelBtn": "Pull a Model",
+    "errorGen": "⚠️ **Error:** Failed to connect to Ollama. Make sure the server is running at **{{url}}** and the model **{{model}}** is pulled."
+  },
+  "models": {
+    "installedTitle": "Installed Models",
+    "noModels": "No models installed. Pull a model using the command line or from settings.",
+    "activeModel": "Active Model for Chats",
+    "activeModelDesc": "This model will be used globally for all new and existing chats.",
+    "family": "Family",
+    "size": "Size",
+    "howToPull": "How to pull models",
+    "howToPullDesc": "Open your terminal and run the `ollama pull` command. Once downloaded, click the refresh button below to see the model in the list.",
+    "refreshBtn": "Refresh Installed Models"
+  },
+  "settings": {
+    "configTitle": "Configuration",
+    "hostLabel": "Ollama Host Connection",
+    "hostDesc": "Standard local host for Ollama is http://localhost:11434",
+    "saveBtn": "Save & Test Connection",
+    "language": "Interface Language",
+    "languageDesc": "Select your preferred application language.",
+    "advancedTitle": "Advanced Settings",
+    "devMode": "Developer Mode",
+    "devModeDesc": "Shows real-time generation stats: tokens/s, total tokens, and response time.",
+    "contextLimit": "Context Limit",
+    "contextLimitDesc": "Max context tokens sent to Ollama (num_ctx). 0 = model default.",
+    "contextPlaceholder": "e.g. 4096",
+    "batchLimit": "Batch Size",
+    "batchLimitDesc": "Number of tokens processed simultaneously during prompt processing (num_batch). Default: 2048."
+  },
+  "devStats": {
+    "tokensPerSec": "tok/s",
+    "totalTokens": "tokens",
+    "promptTokens": "prompt",
+    "time": "ms"
+  }
+}

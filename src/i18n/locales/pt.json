@@ -1,0 +1,62 @@
+{
+  "nav": {
+    "models": "Modelos",
+    "chat": "Chat",
+    "settings": "Ajustes"
+  },
+  "topbar": {
+    "ollamaStatus": "Status do Ollama",
+    "connected": "Conectado",
+    "offline": "Offline",
+    "checking": "Verificando...",
+    "models": "Modelos"
+  },
+  "chat": {
+    "newChat": "Novo Chat",
+    "newConversation": "Nova Conversa",
+    "instant": "Instante",
+    "thinking": "Pensando",
+    "placeholder": "Pergunte qualquer coisa... (Enter envia, Shift+Enter quebra linha)",
+    "generating": "Gerando resposta...",
+    "offlineTitle": "Ollama Offline",
+    "offlineDesc": "Não foi possível conectar ao Ollama em {{url}}. Certifique-se de que o app desktop ou o serviço do Ollama esteja rodando.",
+    "retryBtn": "Tentar Novamente",
+    "noModelsTitle": "Nenhum Modelo Encontrado",
+    "noModelsDesc": "O Ollama está rodando, mas você ainda não baixou nenhum modelo.",
+    "pullModelBtn": "Baixar um Modelo",
+    "errorGen": "⚠️ **Erro:** Falha ao conectar ao Ollama. Certifique-se de que o servidor está rodando em **{{url}}** e o modelo **{{model}}** foi baixado."
+  },
+  "models": {
+    "installedTitle": "Modelos Instalados",
+    "noModels": "Nenhum modelo instalado. Baixe um modelo usando o terminal ou pelas configurações.",
+    "activeModel": "Modelo Ativo para os Chats",
+    "activeModelDesc": "Este modelo será usado globalmente para todos os chats novos e existentes.",
+    "family": "Família",
+    "size": "Tamanho",
+    "howToPull": "Como baixar modelos",
+    "howToPullDesc": "Abra o terminal e execute o comando `ollama pull`. Após o download, clique no botão de atualizar abaixo para ver o modelo na lista.",
+    "refreshBtn": "Atualizar Modelos Instalados"
+  },
+  "settings": {
+    "configTitle": "Configurações",
+    "hostLabel": "Conexão Host do Ollama",
+    "hostDesc": "O host local padrão do Ollama é http://localhost:11434",
+    "saveBtn": "Salvar & Testar Conexão",
+    "language": "Idioma da Interface",
+    "languageDesc": "Selecione o idioma de sua preferência para o aplicativo.",
+    "advancedTitle": "Configurações Avançadas",
+    "devMode": "Modo Desenvolvedor",
+    "devModeDesc": "Exibe estatísticas de geração em tempo real: tokens/s, total de tokens e tempo de resposta.",
+    "contextLimit": "Limite de Contexto",
+    "contextLimitDesc": "Número máximo de tokens de contexto enviados ao Ollama (num_ctx). 0 = padrão do modelo.",
+    "contextPlaceholder": "Ex: 4096",
+    "batchLimit": "Tamanho do Lote (Batch Size)",
+    "batchLimitDesc": "Número de tokens processados simultaneamente durante o processamento do prompt (num_batch). Padrão: 2048."
+  },
+  "devStats": {
+    "tokensPerSec": "tok/s",
+    "totalTokens": "tokens",
+    "promptTokens": "prompt",
+    "time": "ms"
+  }
+}
