@@ -240,8 +240,8 @@ export function useInference() {
           allToolResultsContent += `<tool_result name="${res.name}">\n${res.result}\n</tool_result>\n\n`;
         }
 
-        const lastUserMsg = currentChat.messages[currentChat.messages.length - 1];
-        const isDeepResearch = lastUserMsg?.hiddenContext?.includes('PESQUISA PROFUNDA');
+        const originalPromptMsg = [...currentChat.messages].reverse().find(m => m.role === 'user' && !m.toolResult);
+        const isDeepResearch = originalPromptMsg?.hiddenContext?.includes('PESQUISA PROFUNDA');
         
         let toolAlert = `[SYSTEM ALERT]: Tool execution complete. Review the SYSTEM DIRECTIVES from the original prompt. You MUST ensure you complete ALL mandatory steps (e.g., 'read_url' for deep research, 'generate_file' for saving PDFs) BEFORE providing your final answer. If you still have mandatory tools to run, output another <tool_call> now. Only give your final text answer when all tool chains are finished. Do NOT loop indefinitely.`;
         
