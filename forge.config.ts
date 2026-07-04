@@ -10,13 +10,25 @@ import { FuseV1Options, FuseVersion } from '@electron/fuses';
 const config: ForgeConfig = {
   packagerConfig: {
     asar: true,
+    icon: './assets/icon', // This sets the base icon (resolves to .ico on Win, .png on Linux)
   },
   rebuildConfig: {},
   makers: [
-    new MakerSquirrel({}),
+    new MakerSquirrel({
+      // Windows-specific settings
+      setupIcon: './assets/icon.ico',
+      iconUrl: 'https://raw.githubusercontent.com/emanuelVINI01/lowvia/master/assets/icon.ico', // Squirrel needs this for Add/Remove Programs
+    }),
     new MakerZIP({}, ['darwin']),
-    new MakerRpm({}),
-    new MakerDeb({}),
+    new MakerDeb({
+      options: {
+        bin: 'Lowvia',
+        icon: './assets/icon.png',
+        categories: ['Utility', 'Development'],
+        productName: 'Lowvia',
+        genericName: 'AI Research Agent',
+      }
+    }),
   ],
   plugins: [
     new VitePlugin({

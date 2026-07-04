@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import ChatSidebar from './ChatSidebar';
 import MessageBubble from './MessageBubble';
 import ChatInput from './ChatInput';
@@ -33,6 +33,7 @@ interface ChatAreaProps {
 export default function ChatArea(props: ChatAreaProps) {
   const { t } = useTranslation();
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [showRawHistory, setShowRawHistory] = useState(false);
   const activeChat = props.chats.find(c => c.id === props.activeChatId);
 
   useEffect(() => {
@@ -92,6 +93,38 @@ export default function ChatArea(props: ChatAreaProps) {
           </div>
         ) : (
           <>
+            {props.devMode && activeChat && (
+              <div style={{ display: 'flex', flexDirection: 'column', background: 'rgba(99, 102, 241, 0.1)', borderBottom: '1px solid var(--border-color)' }}>
+                <div style={{ padding: '8px 20px', color: 'var(--accent-indigo)', fontSize: '0.8rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontWeight: 500 }}>Developer Mode Active</span>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <button 
+                      onClick={() => setShowRawHistory(!showRawHistory)}
+                      style={{ background: showRawHistory ? 'var(--accent-indigo)' : 'var(--bg-secondary)', border: '1px solid var(--border-color)', color: showRawHistory ? 'white' : 'var(--text-primary)', padding: '4px 10px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.75rem' }}
+                    >
+                      👁️ {showRawHistory ? 'Esconder JSON' : 'Ver JSON Vivo'}
+                    </button>
+                    <button 
+                      onClick={() => {
+                        const historyText = JSON.stringify(activeChat.messages, null, 2);
+                        navigator.clipboard.writeText(historyText);
+                        alert('Histórico bruto (raw) copiado para a área de transferência!');
+                      }}
+                      style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', color: 'var(--text-primary)', padding: '4px 10px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.75rem' }}
+                    >
+                      📋 Copiar
+                    </button>
+                  </div>
+                </div>
+                {showRawHistory && (
+                  <div style={{ padding: '0 20px 10px 20px' }}>
+                    <pre style={{ margin: 0, padding: '10px', background: '#111', color: '#0f0', fontSize: '0.75rem', borderRadius: '6px', maxHeight: '300px', overflowY: 'auto', whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
+                      {JSON.stringify(activeChat.messages, null, 2)}
+                    </pre>
+                  </div>
+                )}
+              </div>
+            )}
             <div className="messages-list">
               {displayMessages.map((group, groupIdx) => {
                 const isLastInOriginal = group.originalIndexes.includes(activeChat.messages.length - 1);
