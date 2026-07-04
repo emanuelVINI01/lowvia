@@ -1,4 +1,5 @@
 import { AITool } from '../tools';
+import { z } from 'zod';
 import { evaluate } from 'mathjs';
 
 export const calculate: AITool = {
@@ -7,11 +8,14 @@ export const calculate: AITool = {
   parameters: {
     expression: {
       type: 'string',
-      description: 'The mathematical expression to evaluate (e.g. "245 * 892").',
-      required: true,
+      description: 'The math expression to evaluate (e.g. "2 + 2", "Math.sqrt(16)", "Math.PI * 2").',
+      required: true
     }
   },
-  execute: (args) => {
+  schema: z.object({
+    expression: z.string().describe("The mathematical expression to evaluate")
+  }),
+  execute: async (args: Record<string, any>) => {
     try {
       // Safe math evaluation using mathjs instead of eval/Function
       const result = evaluate(args.expression);

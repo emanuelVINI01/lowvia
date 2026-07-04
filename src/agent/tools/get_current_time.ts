@@ -1,4 +1,5 @@
 import { AITool } from '../tools';
+import { z } from 'zod';
 
 export const get_current_time: AITool = {
   name: 'get_current_time',
@@ -10,6 +11,9 @@ export const get_current_time: AITool = {
       required: false,
     }
   },
+  schema: z.object({
+    timezone: z.string().optional(),
+  }),
   execute: (args) => {
     try {
       const options: Intl.DateTimeFormatOptions = { 

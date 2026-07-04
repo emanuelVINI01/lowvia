@@ -3,6 +3,7 @@ import { calculate } from './tools/calculate';
 import { searchWebTool } from './tools/search_web';
 import { readUrlTool } from './tools/read_url';
 import { generateFileTool } from './tools/generate_file';
+import { z } from 'zod';
 
 export interface AIToolParameter {
   type: 'string' | 'number' | 'boolean' | 'array';
@@ -15,6 +16,7 @@ export interface AITool {
   name: string;
   description: string;
   parameters: Record<string, AIToolParameter>;
+  schema?: z.ZodSchema<any>;
   execute: (args: Record<string, any>) => Promise<string> | string;
 }
 

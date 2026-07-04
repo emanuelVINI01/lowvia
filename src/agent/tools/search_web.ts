@@ -1,4 +1,5 @@
 import { AITool } from '../tools';
+import { z } from 'zod';
 import * as cheerio from 'cheerio';
 import TurndownService from 'turndown';
 
@@ -219,7 +220,7 @@ export const searchWebTool: AITool = {
     allowed_domains: {
       type: 'array',
       items: { type: 'string' },
-      description: 'Optional. Restrict search to specific trusted domains (e.g., ["github.com", "wikipedia.org"]).',
+      description: 'Optional. Filter results to specific domains (e.g. ["wikipedia.org", "bbc.com"]). Leave empty for a global search.',
       required: false
     },
     blocked_domains: {
@@ -229,6 +230,12 @@ export const searchWebTool: AITool = {
       required: false
     }
   },
+  schema: z.object({
+    queries: z.array(z.string()).min(1).describe("List of distinct search queries"),
+    time_range: z.enum(['d', 'w', 'm', 'y']).optional().describe("Time range for search results"),
+    allowed_domains: z.array(z.string()).optional().describe("Filter results to specific domains"),
+    blocked_domains: z.array(z.string()).optional().describe("Domains to exclude from results")
+  }),
   execute: async (args: Record<string, any>) => {
     try {
       const { queries, time_range, allowed_domains, blocked_domains } = args as SearchWebArgs;

@@ -1,4 +1,5 @@
 import { AITool } from '../tools';
+import { z } from 'zod';
 import * as cheerio from 'cheerio';
 import TurndownService from 'turndown';
 
@@ -57,10 +58,13 @@ export const readUrlTool: AITool = {
   parameters: {
     url: {
       type: 'string',
-      description: 'The exact, absolute URL of the webpage to read (e.g., https://en.wikipedia.org/wiki/AI).',
+      description: 'The full URL of the webpage to read (e.g. "https://example.com").',
       required: true
     }
   },
+  schema: z.object({
+    url: z.string().url().describe("The exact URL to scrape")
+  }),
   execute: async (args: Record<string, any>) => {
     try {
       const { url } = args as ReadUrlArgs;

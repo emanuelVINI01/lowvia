@@ -281,6 +281,7 @@ body {
   gap: 12px;
   color: var(--text-secondary);
   transition: background 0.2s ease;
+  flex-shrink: 0;
 }
 
 .chat-item:hover {
@@ -1036,3 +1037,4 @@ body {
   max-height: 280px;
   overflow-y: auto;
 }
+\n.tool-only-bubble { background: transparent !important; padding: 0 !important; border: none !important; box-shadow: none !important; margin-bottom: -10px; }

@@ -1,5 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import logo from '../../assets/logo.png';
 
 interface TopBarProps {
   activeTab: 'chat' | 'models' | 'settings';
@@ -22,11 +23,14 @@ export default function TopBar({
 
   return (
     <header className="top-bar">
-      <h1 className="view-title">
-        {activeTab === 'chat' && t('nav.chat')}
-        {activeTab === 'models' && t('nav.models')}
-        {activeTab === 'settings' && t('nav.settings')}
-      </h1>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <img src={logo} alt="Lowvia Logo" style={{ width: '32px', height: '32px', borderRadius: '8px' }} />
+        <h1 className="view-title">
+          {activeTab === 'chat' && t('nav.chat')}
+          {activeTab === 'models' && t('nav.models')}
+          {activeTab === 'settings' && t('nav.settings')}
+        </h1>
+      </div>
 
       <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
         {activeTab === 'chat' && globalModel && (
