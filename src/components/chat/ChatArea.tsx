@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import ChatSidebar from './ChatSidebar';
 import MessageBubble from './MessageBubble';
+import ResearchSidebar from '../research/ResearchSidebar';
 import ChatInput from './ChatInput';
 import DevStatsBar from './DevStatsBar';
 import { ChatSession, DevStats } from '../../types';
@@ -160,6 +161,7 @@ export default function ChatArea(props: ChatAreaProps) {
           </>
         )}
       </div>
+      <ResearchSidebar />
     </div>
   );
 }

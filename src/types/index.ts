@@ -39,3 +39,28 @@ export interface DevStats {
   promptTokens: number;
   generationMs: number;
 }
+
+export interface ResearchPlan {
+  summary: string;
+  steps: string[];
+}
+
+export interface ResearchStep {
+  id: string;
+  type: 'search' | 'read' | 'think';
+  query?: string;
+  url?: string;
+  status: 'pending' | 'active' | 'completed' | 'failed';
+  resultSnippet?: string;
+}
+
+export interface ResearchSession {
+  id: string;
+  title: string;
+  prompt: string;
+  plan?: ResearchPlan;
+  steps: ResearchStep[];
+  status: 'idle' | 'planning' | 'researching' | 'synthesizing' | 'done';
+  report?: string; // The final markdown report
+  updatedAt: number;
+}

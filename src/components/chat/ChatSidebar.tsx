@@ -3,6 +3,9 @@ import { Plus, MessageSquare } from 'lucide-react';
 import { ChatSession } from '../../types';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
+import { useAppDispatch } from '../../store/hooks';
+import { toggleResearchSidebar } from '../../store/slices/researchSlice';
+import { Search } from 'lucide-react';
 
 interface ChatSidebarProps {
   chats: ChatSession[];
@@ -13,12 +16,18 @@ interface ChatSidebarProps {
 
 export default function ChatSidebar({ chats, activeChatId, setActiveChatId, createNewChat }: ChatSidebarProps) {
   const { t } = useTranslation();
+  const dispatch = useAppDispatch();
 
   return (
-    <div className="chat-sidebar">
-      <button className="new-chat-btn" onClick={createNewChat}>
-        <Plus size={16} /> {t('chat.newChat')}
-      </button>
+    <div className="chat-sidebar" style={{ display: 'flex', flexDirection: 'column' }}>
+      <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
+        <button className="new-chat-btn" onClick={createNewChat} style={{ flex: 1 }}>
+          <Plus size={16} /> {t('chat.newChat')}
+        </button>
+        <button className="new-chat-btn" onClick={() => dispatch(toggleResearchSidebar())} style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', color: 'var(--text-primary)', padding: '0 12px' }} title="Deep Research">
+          <Search size={16} />
+        </button>
+      </div>
       <div className="chat-list">
         {chats.map(chat => (
           <div 

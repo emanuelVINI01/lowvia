@@ -1,11 +1,9 @@
 import { ICommand } from './ICommand';
-import { DeepResearchCommand } from './impl/DeepResearchCommand';
 import { CodeCommand } from './impl/CodeCommand';
 import { ModelCommand } from './impl/ModelCommand';
 
 export class CommandFactory {
   private static commands: ICommand[] = [
-    new DeepResearchCommand(),
     new CodeCommand(),
     new ModelCommand()
   ];
