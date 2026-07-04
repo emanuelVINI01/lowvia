@@ -207,7 +207,7 @@ export function useInference() {
           if (toolCall.name === '_syntax_error') {
             return { 
               name: 'error', 
-              result: `CRITICAL ERROR: ${toolCall.arguments.error}. Your previous <tool_call> block contained malformed JSON. You MUST output strictly valid JSON. DO NOT APOLOGIZE. DO NOT EXPLAIN. Just output the corrected <tool_call> block immediately.` 
+              result: `CRITICAL ERROR: ${toolCall.arguments.error}. Your previous <tool_call> block was malformed. You MUST output strictly valid XML/JSON matching the expected schema. DO NOT APOLOGIZE. DO NOT EXPLAIN. Just output the corrected <tool_call> block immediately.` 
             };
           }
 
@@ -246,10 +246,18 @@ export function useInference() {
         let toolAlert = `[SYSTEM ALERT]: Tool execution complete. Review the SYSTEM DIRECTIVES from the original prompt. You MUST ensure you complete ALL mandatory steps (e.g., 'read_url' for deep research, 'generate_file' for saving PDFs) BEFORE providing your final answer. If you still have mandatory tools to run, output another <tool_call> now. Only give your final text answer when all tool chains are finished. Do NOT loop indefinitely.`;
         
         if (isDeepResearch) {
+          const originalPromptIndex = currentChat.messages.findIndex(m => m === originalPromptMsg);
+          const messagesSincePrompt = currentChat.messages.slice(originalPromptIndex + 1);
+          const readUrlCount = messagesSincePrompt.filter(m => m.toolCall?.name === 'read_url').length + extractedTools.filter(t => t.name === 'read_url').length;
+
           if (extractedTools.some(t => t.name === 'search_web')) {
-            toolAlert = `[SYSTEM ALERT]: Tool 'search_web' complete. Since this is a DEEP RESEARCH, you are STRICTLY FORBIDDEN from generating the final answer or generating a file right now. You MUST use the 'read_url' tool to read the full content of the most relevant URLs found in the search results. Output <tool_call><read_url>... now!`;
+            toolAlert = `[SYSTEM ALERT]: Tool 'search_web' complete. Since this is a DEEP RESEARCH, you are STRICTLY FORBIDDEN from generating the final answer or generating a file right now. You MUST use the 'read_url' tool to read the full content of the most relevant URLs found in the search results. You must read at least 3 different URLs. Output <tool_call><read_url>... now!`;
           } else if (extractedTools.some(t => t.name === 'read_url')) {
-            toolAlert = `[SYSTEM ALERT]: Tool 'read_url' complete. If you need to read more URLs, use 'read_url' again. If you have enough dense information, you MUST now use the 'generate_file' tool to write the final detailed report. Do not answer directly in text if the user asked for a file.`;
+            if (readUrlCount < 3) {
+              toolAlert = `[SYSTEM ALERT]: Tool 'read_url' complete. You have only read ${readUrlCount} URL(s) so far. Since this is a DEEP RESEARCH task, you MUST read at least 3 different highly relevant URLs to cross-reference information before generating the final file. You are FORBIDDEN from using 'generate_file' yet. Output another <tool_call><read_url>... now to read the next URL!`;
+            } else {
+              toolAlert = `[SYSTEM ALERT]: Tool 'read_url' complete. You have read ${readUrlCount} URL(s) so far. If you have fulfilled the user's explicit instructions regarding how many pages to read, you MUST now use the 'generate_file' tool to write the final detailed report, synthesizing everything you read. If the user asked you to read MORE pages, you MUST output another <tool_call><read_url>... now! Do not answer directly in text if the user asked for a file.`;
+            }
           }
         }
 

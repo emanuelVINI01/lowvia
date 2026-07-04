@@ -38,7 +38,11 @@ export const extractToolCalls = (text: string): ParsedToolCall[] => {
       } catch (err: any) {
         // --- Generic XML Parsing Fallback ---
         // Match <tool_name> ... </tool_name> anywhere in the block
-        const xmlMatch = jsonStr.match(/<([a-zA-Z0-9_]+)>([\s\S]*?)<\/\1>/);
+        let xmlMatch = jsonStr.match(/<([a-zA-Z0-9_]+)>([\s\S]*?)<\/\1>/);
+        if (!xmlMatch) {
+          // Fallback for missing closing tool tag (e.g. LLM forgot </generate_file>)
+          xmlMatch = jsonStr.match(/<([a-zA-Z0-9_]+)>([\s\S]*)$/);
+        }
         if (xmlMatch) {
           const toolName = xmlMatch[1];
           const innerArgs = xmlMatch[2];
