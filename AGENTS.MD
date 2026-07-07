@@ -44,34 +44,6 @@
   validar com lint, typecheck e build/testes.
 <!-- END:nextjs-agent-rules -->
 
-# Financial Safety Rules
-
-- Never update `users.balance` directly from game engines or routes.
-- All balance changes must go through the central finance/ledger functions.
-- Every BET/WIN/DEPOSIT/WITHDRAWAL/REFUND must have an idempotent `referenceId`.
-- Never mark withdrawals as COMPLETED without real provider confirmation.
-- Divipay withdrawals are disabled until a real provider payout implementation exists.
-- Divipay withdrawals are disabled. Do not enable or implement local-only completion for Divipay withdrawals. A withdrawal may only become COMPLETED after a real provider payout confirmation, signed webhook, or verified provider status lookup.
-- Do not implement local-only withdrawal completion for any gateway.
-- Webhook handlers must be idempotent and must verify signature/replay when provider supports it.
-- State games must persist start idempotency in the database, not only Redis.
-- Redis may cache active game state, but database constraints must prevent financial rerolls.
-- Cashout must be idempotent and must not pay twice.
-- Dice/stateless games must persist result before payout.
-- Test bypasses must never work in production.
-- Do not log gateway secrets, API keys, webhook secrets or credentials.
-- Do not return raw gateway credentials from admin APIs.
-- Gateway credentials are currently stored as plaintext JSON at rest; do not expand that pattern. Encrypt with application/KMS keys before adding new sensitive fields.
-
-# Game Engine Rules
-
-- SSEGameEngine only for global/live games.
-- StateGameEngine for individual stateful games.
-- StatelessEngine for instant games.
-- Frontend never decides result, multiplier or payout.
-- Backend must be source of truth.
-- Idempotency and concurrency tests are required for new games.
-
 # Development Server Rules
 
 - You can start next dev, but if you are through a error of port,
@@ -91,7 +63,4 @@ you can presume the server is already running at that port.
 - typecheck
 - lint
 - relevant API tests
-- financial/idempotency tests when touching games/finance
-- no direct balance mutation
-- no unguarded webhook bypass
 - no secrets in logs/responses
