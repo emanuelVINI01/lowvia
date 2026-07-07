@@ -4,11 +4,22 @@ Lowvia é um assistente de inteligência artificial em formato de aplicação de
 
 ## 🚀 Principais Funcionalidades
 
-- **Integacão Nativa com Ollama:** Executa modelos de linguagem avançados localmente no seu computador, garantindo total privacidade e funcionamento offline (exceto para funcionalidades que precisem da internet, como as pesquisas).
+- **Integração Nativa com Ollama:** Executa modelos de linguagem avançados localmente no seu computador, garantindo total privacidade e funcionamento offline (exceto para funcionalidades que precisem da internet, como as pesquisas).
 - **Pesquisa Profunda Autônoma (Deep Research):** O assistente é capaz de formular pesquisas na web, navegar nas páginas encontradas, fazer *scraping* do conteúdo e analisar múltiplos links cruzando dados antes de dar uma resposta.
 - **Renderização Rica:** Suporte nativo para formatação em Markdown avançada, blocos de código com highlight (Highlight.js) e renderização de expressões matemáticas complexas (KaTeX).
 - **Exportação:** Suporte a conversão e geração de relatórios diretos para PDF.
 - **Interface Fluida:** Desenvolvido em React com animações pelo Framer Motion e UI responsiva usando Tailwind CSS.
+- **Design Premium:** Interface baseada no tema moderno *Yaru Purple* com tipografia elegante (*Plus Jakarta Sans* e *JetBrains Mono*) e micro-animações.
+
+---
+
+## 💬 Comandos Interativos
+
+Lowvia aceita comandos especiais diretamente na barra de entrada de texto:
+
+- **`/pesquisa-profunda`** ou **`/deep-research <sua busca>`**: Ativa o modo de pesquisa detalhado. Lowvia fará pesquisas web cruzadas, extrairá conteúdo de múltiplas fontes via web scraping e criará um relatório exaustivo.
+- **`/codigo`** ou **`/code <seu problema>`**: Ativa o modo Desenvolvedor Sênior. Foca em arquiteturas limpas, melhores práticas e gera os ficheiros finais via utilitários.
+- **`/model <nome-do-modelo>`**: Troca em tempo de execução o modelo de linguagem configurado no Ollama (exemplo: `/model llama3`).
 
 ---
 
@@ -30,7 +41,7 @@ Antes de instalar, certifique-se de que a sua máquina atende aos seguintes requ
 **1. Clone este repositório:**
 Abra o seu terminal e rode o seguinte comando:
 ```bash
-git clone https://github.com/seu-usuario/lowvia.git
+git clone https://github.com/emanuelVINI01/lowvia.git
 cd lowvia
 ```
 *(Se estiver apenas com os ficheiros na máquina local, navegue até à pasta do projeto usando `cd /caminho/para/lowvia`)*
@@ -71,7 +82,7 @@ Os ficheiros empacotados ficarão disponíveis na pasta `out/`.
 ```bash
 npm run make
 ```
-Isto usará o Electron Forge para compilar a aplicação num instalador distribuível pronto a usar.
+Isto usará o Electron Forge para compilar a aplicação num instalador distribuível pronto a usar (disponível sob `out/make/`). No Linux, gera arquivos do tipo `.deb`.
 
 ---
 
