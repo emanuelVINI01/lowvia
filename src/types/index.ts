@@ -16,10 +16,10 @@ export interface ChatSession {
   updatedAt: number;
 }
 
-export type ProviderType = 'ollama' | 'lmstudio';
+export type ProviderType = 'ollama' | 'openrouter';
 
 export interface AIModel {
-  id: string; // Internal API id (name for ollama, id for lmstudio)
+  id: string; // Internal API id (name for ollama, id for openrouter)
   name: string; // Display name
   size?: number; // Size in bytes if available
   provider: ProviderType;

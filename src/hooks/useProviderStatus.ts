@@ -11,7 +11,7 @@ import { AIModel } from '../types';
 
 export function useProviderStatus() {
   const dispatch = useAppDispatch();
-  const { provider, hostUrl, globalModel } = useAppSelector(state => state.settings);
+  const { provider, hostUrl, globalModel, openRouterApiKey } = useAppSelector(state => state.settings);
   const { models, isProviderOnline, modelCapabilities, isCheckingStatus } = useAppSelector(state => state.app);
 
   const fetchModelCapabilities = useCallback(async (modelName: string) => {
@@ -47,34 +47,14 @@ export function useProviderStatus() {
             details: m.details,
           }));
         } else throw new Error();
-      } else if (provider === 'lmstudio') {
-        const cleanHost = hostUrl.replace(/\/v1\/?$/, '');
-        try {
-          const res = await fetch(`${cleanHost}/api/v1/models`);
-          if (res.ok) {
-            const data = await res.json();
-            fetchedModels = (data.models || []).map((m: any) => ({
-              id: m.key || m.id,
-              name: m.display_name || m.key || m.id,
-              size: m.size_bytes,
-              provider: 'lmstudio',
-              capabilities: {
-                vision: m.capabilities?.vision,
-                thinking: m.capabilities?.reasoning !== undefined
-              }
-            }));
-          } else throw new Error('Native API failed');
-        } catch {
-          const fallbackRes = await fetch(`${cleanHost}/v1/models`);
-          if (fallbackRes.ok) {
-            const data = await fallbackRes.json();
-            fetchedModels = (data.data || []).map((m: any) => ({
-              id: m.id,
-              name: m.id,
-              provider: 'lmstudio',
-            }));
-          } else throw new Error('Fallback API failed');
+      } else if (provider === 'openrouter') {
+        if (!openRouterApiKey) throw new Error('No API key');
+        // We do not fetch all models for openrouter by default to avoid huge lists
+        // If there's a global model, we add it to the list
+        if (globalModel) {
+          fetchedModels = [{ id: globalModel, name: globalModel, provider: 'openrouter' }];
         }
+        dispatch(setIsProviderOnline(true));
       }
 
       dispatch(setModels(fetchedModels));
@@ -90,7 +70,7 @@ export function useProviderStatus() {
     } finally { 
       dispatch(setIsCheckingStatus(false)); 
     }
-  }, [hostUrl, provider, globalModel, dispatch]);
+  }, [hostUrl, provider, globalModel, openRouterApiKey, dispatch]);
 
   const handleGlobalModelChange = useCallback(async (name: string) => {
     if (globalModel && globalModel !== name) {
@@ -102,47 +82,23 @@ export function useProviderStatus() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ model: globalModel, keep_alive: 0 })
           });
-        } else if (provider === 'lmstudio') {
-          await fetch(`${cleanHost}/v1/models/unload`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ model: globalModel })
-          });
         }
       } catch (e) {
         console.error('Failed to unload previous model', e);
       }
     }
-
-    if (provider === 'lmstudio' && name) {
-      try {
-        const cleanHost = hostUrl.replace(/\/v1\/?$/, '');
-        await fetch(`${cleanHost}/v1/models/load`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ 
-            model: name,
-            gpu_offload: "max",
-            offload_kv_cache_to_gpu: true 
-          })
-        });
-      } catch (e) {
-        console.error('Failed to preload model', e);
-      }
-    }
-
     dispatch(setGlobalModel(name));
   }, [globalModel, hostUrl, provider, dispatch]);
 
   useEffect(() => { checkProviderStatus(); }, [hostUrl, provider, checkProviderStatus]);
 
   useEffect(() => {
-    if (!globalModel || !isProviderOnline || provider === 'lmstudio') return;
+    if (!globalModel || !isProviderOnline || provider === 'openrouter') return;
     fetchModelCapabilities(globalModel);
   }, [globalModel, isProviderOnline, hostUrl, provider, fetchModelCapabilities]);
 
-  const supportsThinking = provider === 'lmstudio' 
-    ? true 
+  const supportsThinking = provider === 'openrouter' 
+    ? true // By default let's assume it might support it or users can use reasoning models
     : modelCapabilities.includes('thinking');
 
   return {

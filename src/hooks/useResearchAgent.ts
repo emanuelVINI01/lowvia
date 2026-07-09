@@ -18,7 +18,7 @@ export function useResearchAgent() {
   const dispatch = useAppDispatch();
   const abortControllers = useRef<Map<string, AbortController>>(new Map());
 
-  const { hostUrl, globalModel, provider, contextLimit, batchLimit, isThinkingMode } = useAppSelector(state => state.settings);
+  const { hostUrl, globalModel, provider, contextLimit, batchLimit, isThinkingMode, openRouterApiKey } = useAppSelector(state => state.settings);
   const { modelCapabilities } = useAppSelector(state => state.app);
   const supportsThinking = provider === 'ollama' && modelCapabilities.includes('think');
 
@@ -75,7 +75,10 @@ DO NOT output anything else. Just the <plan> block.`;
       const res = await fetch(`${cleanHost}${provider === 'ollama' ? '/api/chat' : '/v1/chat/completions'}`, {
         method: 'POST',
         signal: abort.signal,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          ...(provider === 'openrouter' && openRouterApiKey ? { 'Authorization': `Bearer ${openRouterApiKey}` } : {})
+        },
         body: JSON.stringify(reqBody),
       });
 
@@ -97,7 +100,7 @@ DO NOT output anything else. Just the <plan> block.`;
             const line = rawLine.trim();
             if (!line) continue;
             let jsonString = line;
-            if (provider === 'lmstudio') {
+            if (provider === 'openrouter') {
               if (line === 'data: [DONE]') continue;
               if (line.startsWith('data: ')) jsonString = line.replace(/^data: /, '');
               else continue;
@@ -175,7 +178,10 @@ Passos obrigatórios:
         const res = await fetch(`${cleanHost}${provider === 'ollama' ? '/api/chat' : '/v1/chat/completions'}`, {
           method: 'POST',
           signal: abort.signal,
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 
+            'Content-Type': 'application/json',
+            ...(provider === 'openrouter' && openRouterApiKey ? { 'Authorization': `Bearer ${openRouterApiKey}` } : {})
+          },
           body: JSON.stringify(reqBody),
         });
 
@@ -198,7 +204,7 @@ Passos obrigatórios:
               const line = rawLine.trim();
               if (!line) continue;
               let jsonString = line;
-              if (provider === 'lmstudio') {
+              if (provider === 'openrouter') {
                 if (line === 'data: [DONE]') continue;
                 if (line.startsWith('data: ')) jsonString = line.replace(/^data: /, '');
                 else continue;
@@ -282,7 +288,7 @@ Passos obrigatórios:
     await executeLoop(history);
 
     abortControllers.current.delete(sessionId);
-  }, [dispatch, hostUrl, globalModel, provider, contextLimit, isThinkingMode, supportsThinking]);
+  }, [dispatch, hostUrl, globalModel, provider, contextLimit, isThinkingMode, supportsThinking, openRouterApiKey]);
 
   const abortResearch = useCallback((sessionId: string) => {
     abortControllers.current.get(sessionId)?.abort();

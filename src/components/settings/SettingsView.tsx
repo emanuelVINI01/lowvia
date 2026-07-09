@@ -14,6 +14,8 @@ interface SettingsViewProps {
   setContextLimit: (v: number) => void;
   batchLimit: number;
   setBatchLimit: (v: number) => void;
+  openRouterApiKey: string;
+  setOpenRouterApiKey: (k: string) => void;
 }
 
 export default function SettingsView({
@@ -28,6 +30,8 @@ export default function SettingsView({
   setContextLimit,
   batchLimit,
   setBatchLimit,
+  openRouterApiKey,
+  setOpenRouterApiKey,
 }: SettingsViewProps) {
   const { t, i18n } = useTranslation();
 
@@ -69,27 +73,27 @@ export default function SettingsView({
               </div>
             </div>
             
-            {/* LM Studio Card */}
+            {/* OpenRouter Card */}
             <div 
               onClick={() => {
-                setProvider('lmstudio');
-                setHostUrl('http://localhost:1234');
+                setProvider('openrouter');
+                setHostUrl('https://openrouter.ai/api/v1');
               }}
               style={{
                 flex: 1,
                 padding: '16px',
                 borderRadius: '8px',
-                border: `2px solid ${provider === 'lmstudio' ? 'var(--accent-indigo)' : 'var(--border-color)'}`,
-                backgroundColor: provider === 'lmstudio' ? 'rgba(99, 102, 241, 0.05)' : 'var(--bg-tertiary)',
+                border: `2px solid ${provider === 'openrouter' ? 'var(--accent-indigo)' : 'var(--border-color)'}`,
+                backgroundColor: provider === 'openrouter' ? 'rgba(99, 102, 241, 0.05)' : 'var(--bg-tertiary)',
                 cursor: 'pointer',
                 transition: 'all 0.2s ease',
               }}
             >
-              <div style={{ fontWeight: 600, color: provider === 'lmstudio' ? 'var(--accent-indigo)' : 'var(--text-primary)' }}>
-                LM Studio
+              <div style={{ fontWeight: 600, color: provider === 'openrouter' ? 'var(--accent-indigo)' : 'var(--text-primary)' }}>
+                OpenRouter
               </div>
               <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '4px' }}>
-                OpenAI compatible local server
+                Access to hundreds of cloud models
               </div>
             </div>
           </div>
@@ -108,6 +112,22 @@ export default function SettingsView({
             {t('settings.hostDesc')}
           </span>
         </div>
+
+        {provider === 'openrouter' && (
+          <div className="form-group" style={{ marginTop: '20px' }}>
+            <label className="form-label">OpenRouter API Key</label>
+            <input
+              type="password"
+              className="form-input"
+              value={openRouterApiKey}
+              onChange={(e) => setOpenRouterApiKey(e.target.value)}
+              placeholder="sk-or-v1-..."
+            />
+            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+              Required for OpenRouter models. Get one at openrouter.ai
+            </span>
+          </div>
+        )}
 
         <div className="form-group" style={{ marginTop: '20px' }}>
           <label className="form-label">{t('settings.language')}</label>

@@ -24,7 +24,7 @@ export function useInference() {
   const abortControllers = useRef<Map<string, AbortController>>(new Map());
 
   // We select what we need from Redux for the stream
-  const { hostUrl, globalModel, provider, contextLimit, batchLimit, devMode, isThinkingMode } = useAppSelector(state => state.settings);
+  const { hostUrl, globalModel, provider, contextLimit, batchLimit, devMode, isThinkingMode, openRouterApiKey } = useAppSelector(state => state.settings);
   const { modelCapabilities } = useAppSelector(state => state.app);
 
   const supportsThinking = provider === 'ollama' && modelCapabilities.includes('think');
@@ -94,7 +94,10 @@ export function useInference() {
         res = await fetch(`${cleanHost}/v1/chat/completions`, {
           method: 'POST',
           signal: abort.signal,
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 
+            'Content-Type': 'application/json',
+            ...(provider === 'openrouter' && openRouterApiKey ? { 'Authorization': `Bearer ${openRouterApiKey}` } : {})
+          },
           body: JSON.stringify({
             model: globalModel,
             messages: [{ role: 'system', content: prompt }, ...history],
@@ -134,7 +137,7 @@ export function useInference() {
           if (!line) continue;
 
           let jsonString = line;
-          if (provider === 'lmstudio') {
+          if (provider === 'openrouter') {
             if (line === 'data: [DONE]') continue;
             if (line.startsWith('data: ')) {
               jsonString = line.replace(/^data: /, '');
@@ -183,7 +186,7 @@ export function useInference() {
                   promptTokens: parsed.prompt_eval_count ?? 0,
                   generationMs: Date.now() - startTime,
                 }));
-              } else if (provider === 'lmstudio' && parsed?.usage) {
+              } else if (provider === 'openrouter' && parsed?.usage) {
                 const generationMs = Date.now() - startTime;
                 const completionTokens = parsed.usage.completion_tokens ?? 0;
                 dispatch(setDevStats({
@@ -292,7 +295,7 @@ export function useInference() {
         return;
       }
       
-      const providerName = provider === 'lmstudio' ? 'LM Studio' : 'Ollama';
+      const providerName = provider === 'openrouter' ? 'OpenRouter' : 'Ollama';
       const errorContent = `**Falha de Conexão: ${providerName}**\n\n- **Servidor:** \`${hostUrl}\`\n- **Modelo:** \`${globalModel || 'Nenhum'}\`\n- **Detalhe:** \`${err.message || 'Erro desconhecido'}\`\n\nPor favor, verifique se o ${providerName} está em execução e acessível.`;
       
       dispatch(updateMessageContent({
@@ -311,7 +314,7 @@ export function useInference() {
         abortControllers.current.delete(targetChatId);
       }
     }
-  }, [hostUrl, globalModel, provider, contextLimit, batchLimit, devMode, isThinkingMode, supportsThinking, t, dispatch]);
+  }, [hostUrl, globalModel, provider, contextLimit, batchLimit, devMode, isThinkingMode, supportsThinking, openRouterApiKey, t, dispatch]);
 
   const abortGeneration = useCallback((chatId: string) => {
     abortControllers.current.get(chatId)?.abort();
@@ -343,7 +346,10 @@ export function useInference() {
       } else {
         const res = await fetch(`${cleanHost}/v1/chat/completions`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 
+            'Content-Type': 'application/json',
+            ...(provider === 'openrouter' && openRouterApiKey ? { 'Authorization': `Bearer ${openRouterApiKey}` } : {})
+          },
           body: JSON.stringify({
             model: globalModel,
             messages: [{ role: 'user', content: prompt }],

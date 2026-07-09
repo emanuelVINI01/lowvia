@@ -10,7 +10,7 @@ import { useTranslation } from 'react-i18next';
 import { CommandFactory } from './agent/commands/CommandFactory';
 import { useAppDispatch, useAppSelector } from './store/hooks';
 import { setActiveTab, setInput } from './store/slices/appSlice';
-import { setProvider, setHostUrl, setDevMode, setContextLimit, setBatchLimit, setIsThinkingMode } from './store/slices/settingsSlice';
+import { setProvider, setHostUrl, setDevMode, setContextLimit, setBatchLimit, setIsThinkingMode, setOpenRouterApiKey } from './store/slices/settingsSlice';
 import { setChats, setActiveChatId, addChat, updateChatMessages } from './store/slices/chatSlice';
 import { useProviderStatus } from './hooks/useProviderStatus';
 import { useInference } from './hooks/useInference';
@@ -22,7 +22,7 @@ export default function App() {
   const dispatch = useAppDispatch();
   
   const { activeTab, input, devStats } = useAppSelector(state => state.app);
-  const { provider, hostUrl, globalModel, devMode, contextLimit, batchLimit, isThinkingMode } = useAppSelector(state => state.settings);
+  const { provider, hostUrl, globalModel, devMode, contextLimit, batchLimit, isThinkingMode, openRouterApiKey } = useAppSelector(state => state.settings);
   const { chats, activeChatId, generatingChats } = useAppSelector(state => state.chat);
 
   const { models, isProviderOnline, isCheckingStatus, supportsThinking, checkProviderStatus, handleGlobalModelChange } = useProviderStatus();
@@ -250,6 +250,8 @@ export default function App() {
                   setContextLimit={(v) => dispatch(setContextLimit(v))}
                   batchLimit={batchLimit}
                   setBatchLimit={(v) => dispatch(setBatchLimit(v))}
+                  openRouterApiKey={openRouterApiKey}
+                  setOpenRouterApiKey={(v) => dispatch(setOpenRouterApiKey(v))}
                 />
               </motion.div>
             )}

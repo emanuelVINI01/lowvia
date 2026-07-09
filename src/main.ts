@@ -17,7 +17,7 @@ const createWindow = () => {
     autoHideMenuBar: true,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
-      webSecurity: false, // Bypass CORS for local AI APIs (LM Studio/Ollama)
+      webSecurity: false, // Bypass CORS for AI APIs (OpenRouter/Ollama)
     },
   });
 
