@@ -1,8 +1,8 @@
 {
-  "name": "Lowvia",
+  "name": "lowvia",
   "productName": "Lowvia",
   "version": "1.0.0",
-  "description": "My Electron application description",
+  "description": "An open-source desktop AI assistant powered by Ollama, featuring Deep Research capabilities and an elegant UI.",
   "main": ".vite/build/main.js",
   "private": true,
   "scripts": {
@@ -14,7 +14,7 @@
     "lint": "eslint --ext .ts,.tsx ."
   },
   "keywords": [],
-  "author": "emanuel",
+  "author": "Emanuel (emanuelVINI01)",
   "license": "MIT",
   "devDependencies": {
     "@electron-forge/cli": "^7.11.2",

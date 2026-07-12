@@ -1,102 +1,143 @@
 # Lowvia
 
-Lowvia é um assistente de inteligência artificial em formato de aplicação desktop (Electron), construído com tecnologias modernas como **React, Vite e Tailwind CSS**. Ele foi projetado para rodar modelos locais via **Ollama** e possui capacidades nativas avançadas, incluindo um modo de **Pesquisa Profunda (Deep Research)** que busca e processa informações da web autonomamente.
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Node.js Version](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen)](https://nodejs.org)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](https://makeapullrequest.com)
 
-## 🚀 Principais Funcionalidades
+<!-- TODO: Add a high-quality screenshot or GIF of your application here -->
+> 🖼️ *Add a screenshot or GIF of Lowvia here to show off your UI!*
 
-- **Integração Nativa com Ollama:** Executa modelos de linguagem avançados localmente no seu computador, garantindo total privacidade e funcionamento offline (exceto para funcionalidades que precisem da internet, como as pesquisas).
-- **Pesquisa Profunda Autônoma (Deep Research):** O assistente é capaz de formular pesquisas na web, navegar nas páginas encontradas, fazer *scraping* do conteúdo e analisar múltiplos links cruzando dados antes de dar uma resposta.
-- **Renderização Rica:** Suporte nativo para formatação em Markdown avançada, blocos de código com highlight (Highlight.js) e renderização de expressões matemáticas complexas (KaTeX).
-- **Exportação:** Suporte a conversão e geração de relatórios diretos para PDF.
-- **Interface Fluida:** Desenvolvido em React com animações pelo Framer Motion e UI responsiva usando Tailwind CSS.
-- **Design Premium:** Interface baseada no tema moderno *Yaru Purple* com tipografia elegante (*Plus Jakarta Sans* e *JetBrains Mono*) e micro-animações.
+Lowvia is an AI assistant in the form of a desktop application (Electron), built with modern technologies such as **React, Vite, and Tailwind CSS**. It is designed to run local models via **Ollama** and features advanced native capabilities, including a **Deep Research** mode that autonomously searches and processes information from the web.
 
----
+## 🚀 Key Features
 
-## 💬 Comandos Interativos
-
-Lowvia aceita comandos especiais diretamente na barra de entrada de texto:
-
-- **`/pesquisa-profunda`** ou **`/deep-research <sua busca>`**: Ativa o modo de pesquisa detalhado. Lowvia fará pesquisas web cruzadas, extrairá conteúdo de múltiplas fontes via web scraping e criará um relatório exaustivo.
-- **`/codigo`** ou **`/code <seu problema>`**: Ativa o modo Desenvolvedor Sênior. Foca em arquiteturas limpas, melhores práticas e gera os ficheiros finais via utilitários.
-- **`/model <nome-do-modelo>`**: Troca em tempo de execução o modelo de linguagem configurado no Ollama (exemplo: `/model llama3`).
+- **Native Ollama & OpenRouter Integration:** Runs advanced language models locally on your computer via Ollama ensuring privacy, or connects to the cloud via **OpenRouter** for accessing state-of-the-art models like GPT-4, Claude 3, and more.
+- **Autonomous Deep Research:** The assistant can formulate web searches, navigate found pages, scrape content, and analyze multiple links to cross-reference data before providing an answer.
+- **Rich Rendering:** Native support for advanced Markdown formatting, syntax-highlighted code blocks (Highlight.js), and rendering of complex mathematical expressions (KaTeX).
+- **Exporting:** Support for converting and generating direct PDF reports.
+- **Fluid Interface:** Developed in React with animations by Framer Motion and a responsive UI using Tailwind CSS.
+- **Premium Design:** Interface based on the modern *Yaru Purple* theme with elegant typography (*Plus Jakarta Sans* and *JetBrains Mono*) and micro-animations.
 
 ---
 
-## 📦 Pré-requisitos
+## 💬 Interactive Commands
 
-Antes de instalar, certifique-se de que a sua máquina atende aos seguintes requisitos:
+Lowvia accepts special commands directly in the text input bar:
 
-1. **[Node.js](https://nodejs.org/pt-br/)**: Versão 18 ou superior.
-2. **[Git](https://git-scm.com/)**: Para clonar o repositório.
-3. **[Ollama](https://ollama.com/)**: O motor de modelos locais. Tem de estar instalado e a correr em *background* na sua máquina (por padrão na porta `11434`).
-
-> **Nota sobre o Ollama:** Após instalar o Ollama, garanta que descarregou algum modelo, pois o assistente vai precisar dele. Você pode puxar um modelo abrindo o terminal e digitando:
-> `ollama run llama3` (ou outro modelo da sua preferência).
+- **`/deep-research <your search>`** or **`/pesquisa-profunda`**: Activates the detailed research mode. Lowvia will perform cross-referenced web searches, extract content from multiple sources via web scraping, and create an exhaustive report.
+- **`/code <your problem>`** or **`/codigo`**: Activates the Senior Developer mode. Focuses on clean architectures, best practices, and generates the final files via utilities.
+- **`/model <model-name>`**: Changes the language model configured in Ollama at runtime (e.g., `/model llama3`).
 
 ---
 
-## 🛠️ Como Baixar e Instalar
+## 📦 Prerequisites
 
-**1. Clone este repositório:**
-Abra o seu terminal e rode o seguinte comando:
+Before installing, make sure your machine meets the following requirements:
+
+1. **[Node.js](https://nodejs.org/en/)**: Version 18 or higher.
+2. **[Git](https://git-scm.com/)**: To clone the repository.
+3. **[Ollama](https://ollama.com/)**: The engine for local models. It must be installed and running in the background on your machine (default port `11434`).
+
+> **Note on Ollama:** After installing Ollama, ensure you have downloaded a model, as the assistant will need one. You can pull a model by opening your terminal and typing:
+> `ollama run llama3` (or any other model of your choice).
+
+---
+
+## 🛠️ How to Download and Install
+
+**1. Clone this repository:**
+Open your terminal and run the following command:
 ```bash
 git clone https://github.com/emanuelVINI01/lowvia.git
 cd lowvia
 ```
-*(Se estiver apenas com os ficheiros na máquina local, navegue até à pasta do projeto usando `cd /caminho/para/lowvia`)*
 
-**2. Instale as dependências:**
-Utilize o NPM (que vem incluído no Node.js) para instalar todas as bibliotecas necessárias:
+*(If you only have the files locally, navigate to the project folder using `cd /path/to/lowvia`)*
+
+**2. Install dependencies:**
+Use NPM (included with Node.js) to install all required libraries:
 ```bash
 npm install
 ```
 
 ---
 
-## 💻 Configuração e Desenvolvimento
+## 📖 Tutorial: Getting Started with Providers
 
-O ambiente já está totalmente configurado através do `electron-forge` e do Vite. Não é necessário criar ficheiros `.env` complexos, o agente conecta-se de forma nativa ao Ollama local.
+Lowvia supports both local models (Ollama) and cloud models (OpenRouter).
 
-Para iniciar a aplicação em **Modo de Desenvolvimento** (com *Hot Reloading*):
+### Using Local Models (Ollama)
+1. Make sure Ollama is running in the background.
+2. In the Lowvia settings, select **Ollama** as your provider.
+3. The default host is `http://127.0.0.1:11434`.
+4. Make sure you have pulled at least one model via terminal (e.g., `ollama run llama3`).
+
+### Using Cloud Models (OpenRouter)
+If your computer cannot run heavy local models, or if you want to use advanced models like GPT-4o or Claude 3.5 Sonnet, you can use OpenRouter:
+1. Create an account at [OpenRouter](https://openrouter.ai/).
+2. Generate an API Key in your OpenRouter account settings.
+3. Open Lowvia, go to the settings menu, and switch the provider to **OpenRouter**.
+4. Paste your API Key in the designated field.
+5. Select the model you wish to use (e.g., `openai/gpt-4o`).
+
+---
+
+## 💻 Configuration and Development
+
+The environment is fully configured via `electron-forge` and Vite. There is no need to create complex `.env` files; the agent connects natively to the local Ollama instance.
+
+To start the application in **Development Mode** (with *Hot Reloading*):
 ```bash
 npm run dev
 ```
-*(O comando `npm start` também funciona de forma equivalente).*
+*(The `npm start` command works equivalently).*
 
-Assim que executar o comando, o Vite irá compilar o código do React (Front-end) e abrirá a janela nativa do Electron da aplicação.
+Once you run the command, Vite will compile the React code (Front-end) and open the application's native Electron window.
 
 ---
 
-## 🏗️ Como Gerar o Executável (Build e Deploy)
+## 🏗️ How to Generate the Executable (Build and Deploy)
 
-Se quiser exportar a aplicação para partilhar com os seus utilizadores ou instalar na sua máquina sem precisar do terminal, pode gerar os binários executáveis finais (como `.deb`, `.rpm`, `.zip` ou instaladores para Windows/Mac, dependendo do seu Sistema Operativo atual).
+If you want to export the application to share with users or install on your machine without needing the terminal, you can generate final executable binaries (such as `.deb`, `.rpm`, `.zip`, or installers for Windows/Mac, depending on your current Operating System).
 
-**1. Empacotar a aplicação** (Apenas gera a pasta com os binários executáveis):
+**1. Package the application** (Only generates the folder with executable binaries):
 ```bash
 npm run package
 ```
-Os ficheiros empacotados ficarão disponíveis na pasta `out/`.
+The packaged files will be available in the `out/` folder.
 
-**2. Criar os Instaladores (Make)** (Cria os ficheiros de instalação completos):
+**2. Create Installers (Make)** (Creates full installation files):
 ```bash
 npm run make
 ```
-Isto usará o Electron Forge para compilar a aplicação num instalador distribuível pronto a usar (disponível sob `out/make/`). No Linux, gera arquivos do tipo `.deb`.
+This uses Electron Forge to compile the application into a ready-to-use distributable installer (available under `out/make/`). On Linux, it generates `.deb` files.
 
 ---
 
-## 📚 Tecnologias Utilizadas
+## 📚 Technologies Used
 
 - **Core:** Electron, Node.js
 - **Interface:** React 19, Redux Toolkit, TailwindCSS v4, Framer Motion, Lucide React
-- **Build & Compilação:** Vite, TypeScript, Electron Forge
-- **Inteligência Artificial:** Ollama (NPM package)
-- **Scraping e Research:** googlethis, cheerio, turndown
-- **Renderização e Exportação:** react-markdown, remark-gfm, remark-math, rehype-katex, rehype-highlight, html2pdf.js
+- **Build & Compilation:** Vite, TypeScript, Electron Forge
+- **Artificial Intelligence:** Ollama (Local), OpenRouter (Cloud API)
+- **Scraping and Research:** googlethis, cheerio, turndown
+- **Rendering & Export:** react-markdown, remark-gfm, remark-math, rehype-katex, rehype-highlight, html2pdf.js
 
 ---
 
-## 📝 Licença
+## 🤖 Agents Architecture
 
-Este projeto está sob a licença [MIT](LICENSE). Pode utilizá-lo livremente, modificá-lo e distribuí-lo.
+Lowvia relies on a structured agent architecture to handle complex requests. To learn more about how the agents are structured and operate under the hood, please read our [Agents Documentation](AGENTS.MD).
+
+---
+
+## 🤝 Contributing
+
+Contributions, issues, and feature requests are welcome! 
+Feel free to check the [issues page](https://github.com/emanuelVINI01/lowvia/issues). For more detailed instructions on how to contribute, please see our [Contribution Guidelines](CONTRIBUTING.md).
+
+---
+
+## 📝 License
+
+This project is licensed under the [MIT License](LICENSE). You are free to use, modify, and distribute it.
